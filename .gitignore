@@ -58,6 +58,11 @@ ehthumbs.db
 Desktop.ini
 .DS_Store
 
+## SQLite
+*.db
+*.db-shm
+*.db-wal
+
 ## Others
 *.log
 *.tmp
