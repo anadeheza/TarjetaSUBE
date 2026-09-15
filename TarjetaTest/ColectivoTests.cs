@@ -8,7 +8,7 @@ public class ColectivoTests
     public void PagarCon_GeneraBoletoYDescuentaSaldo()
     {
         var tarjeta = new Tarjeta(1);
-        tarjeta.Cargar(2000);
+        tarjeta.cargaRealizada(2000);
         var colectivo = new Colectivo("102");
 
         var boleto = colectivo.PagarCon(tarjeta);
@@ -27,6 +27,6 @@ public class ColectivoTests
         var boleto = colectivo.PagarCon(tarjeta);
 
         Assert.That(boleto, Is.Null);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(0));
+        Assert.That(tarjeta.saldo, Is.EqualTo(0));
     }
 }
