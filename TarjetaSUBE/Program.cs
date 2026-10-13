@@ -1,19 +1,21 @@
 using Sube;
 
-var tarjeta = new Tarjeta(1);
+var tipoNormal = new TarjetaTipo(1, "Normal", 1.0m);
+var tarjeta = new Tarjeta(1, tipoNormal);
+
 Console.WriteLine($"Tarjeta {tarjeta.Id} creada. Saldo: ${tarjeta.Saldo}");
 
-if (tarjeta.Cargar(2000))
+if (tarjeta.CargaRealizada(2000))
 {
     Console.WriteLine($"Carga de $2000 OK. Saldo: ${tarjeta.Saldo}");
 }
 
 var colectivo = new Colectivo("102");
-var boleto = colectivo.PagarCon(tarjeta);
+bool pudoViajar = colectivo.PagarCon(tarjeta);
 
-if (boleto is not null)
+if (pudoViajar)
 {
-    Console.WriteLine($"Viaje en linea {colectivo.Linea}. Boleto: ${boleto.Precio}. Saldo restante: ${tarjeta.Saldo}");
+    Console.WriteLine($"Viaje en linea {colectivo.Linea}. Saldo restante: ${tarjeta.Saldo}");
 }
 else
 {
