@@ -1,35 +1,38 @@
 ﻿using System;
 
-namespace Sube
+namespace Sube;
+
+public class Tarjeta
 {
-    public class Tarjeta
+    public int Id { get; set; }
+    public int Saldo { get; set; }
+
+    public Tarjeta(int id)
     {
-        public int saldo;
-        public int id;
+        Id = id;
+        Saldo = 0;
+    }
 
-        public Tarjeta(int id)
+    public bool PagoRealizado(int tarifa)
+    {
+        if (Saldo < tarifa)
+            return false;
+
+        Saldo -= tarifa;
+        return true;
+    }
+
+    public bool CargaRealizada(int monto)
+    {
+        if (monto == 2000 || monto == 3000 || monto == 4000 || monto == 5000 ||
+            monto == 8000 || monto == 10000 || monto == 15000 || monto == 20000 ||
+            monto == 25000 || monto == 30000)
         {
-            this.id = id;
-            this.saldo = 0;
+            Saldo += monto;
+            return true;
         }
 
-        public void pagoRealizado()
-        {
-            saldo -= 1580;
-        }
-
-        public void cargaRealizada(int monto)
-        {
-            if (monto == 2000 || monto == 3000 || monto == 4000 || monto == 5000 ||
-                monto == 8000 || monto == 10000 || monto == 15000 || monto == 20000 ||
-                monto == 25000 || monto == 30000)
-            {
-                saldo += monto;
-            }
-            else
-            {
-                Console.Error.WriteLine("Solo se aceptan los montos $2000, $3000, $4000, $5000, $8000, $10000, $15000, $20000, $25000 y $30000");
-            }
-        }
+        Console.Error.WriteLine("Solo se aceptan los montos $2000, $3000, $4000, $5000, $8000, $10000, $15000, $20000, $25000 y $30000");
+        return false;
     }
 }
