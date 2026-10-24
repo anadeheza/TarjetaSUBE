@@ -14,9 +14,11 @@ public class Colectivo
 
     public Boleto? PagarCon(Tarjeta tarjeta)
     {
+        int precio = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
+
         if (!tarjeta.pagoRealizado(Tarjeta.TarifaBasica))
             return null;
 
-        return new Boleto(this, tarjeta, Tarjeta.TarifaBasica);
+        return new Boleto(this, tarjeta, precio);
     }
 }

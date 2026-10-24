@@ -13,12 +13,31 @@ namespace Sube
         public int saldo;
         public int Saldo => saldo;
 
+        public int Id_Tipo { get; set; }
+        public TarjetaTipo Tipo { get; set; } = null!;
+
         public Tarjeta() { }
 
         public Tarjeta(int id)
         {
             this.Id = id;
             this.saldo = 0;
+        }
+
+        public Tarjeta(int id, TarjetaTipo tipo)
+        {
+            Id = id;
+            saldo = 0;
+            Tipo = tipo;
+            Id_Tipo = tipo.Id;
+        }
+
+        public int CalcularBoleto(int tarifaBase)
+        {
+            if (Tipo is null)
+                return tarifaBase;
+
+            return (int)Math.Round(tarifaBase * Tipo.Descuento);
         }
 
         public bool Cargar(int monto)
@@ -34,9 +53,14 @@ namespace Sube
 
         public bool pagoRealizado(int monto)
         {
-            if((saldo - monto) < SaldoMin) return false;
+            int costo = CalcularBoleto(monto);
 
-            saldo -= monto;
+            if (costo == 0)
+                return true;
+
+            if ((saldo - costo) < SaldoMin) return false;
+
+            saldo -= costo;
             return true;
         }
     }
