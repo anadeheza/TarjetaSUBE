@@ -6,6 +6,7 @@ namespace Sube
     {
         public const int TarifaBasica = 1580;
         private const int SaldoMax = 40000;
+        private const int SaldoMin = -2000;
         private static int[] MontosValidos = { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
 
         public int Id { get; set; }
@@ -33,7 +34,7 @@ namespace Sube
 
         public bool pagoRealizado(int monto)
         {
-            if(saldo < monto) return false;
+            if((saldo - monto) < SaldoMin) return false;
 
             saldo -= monto;
             return true;

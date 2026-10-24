@@ -60,13 +60,37 @@ public class TarjetaTests
     }
 
     [Test]
-    public void Descontar_NoDejaSaldoNegativo()
+    public void Descontar_PermiteViajePlusSiNoHaySaldo()
     {
         var tarjeta = new Tarjeta(1);
 
         var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
+        Assert.That(resultado, Is.True);
+        Assert.That(tarjeta.Saldo, Is.EqualTo(-Tarjeta.TarifaBasica));
+    }
+
+    [Test]
+    public void Descontar_NoPermiteBajarDelSaldoMinimo()
+    {
+        var tarjeta = new Tarjeta(1);
+        tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+
+        var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+
         Assert.That(resultado, Is.False);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(0));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(-Tarjeta.TarifaBasica));
+    }
+
+    [Test]
+    public void Cargar_DescuentaElViajePlus() 
+    {
+        var tarjeta = new Tarjeta(1);
+        tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+
+        var resultado = tarjeta.Cargar(2000);
+
+        Assert.That(resultado, Is.True);
+        Assert.That(tarjeta.Saldo, Is.EqualTo(2000-Tarjeta.TarifaBasica));
     }
 }
