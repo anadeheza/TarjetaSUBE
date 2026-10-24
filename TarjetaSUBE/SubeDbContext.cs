@@ -8,6 +8,7 @@ public class SubeDbContext : DbContext
 
     public SubeDbContext(DbContextOptions<SubeDbContext> opciones) : base(opciones) { }
 
+    public DbSet<TarjetaTipo> TarjetaTipos => Set<TarjetaTipo>();
     public DbSet<Tarjeta> Tarjetas => Set<Tarjeta>();
     public DbSet<Colectivo> Colectivos => Set<Colectivo>();
     public DbSet<Boleto> Boletos => Set<Boleto>();
