@@ -39,9 +39,9 @@ public class TarjetaTests
     public void Cargar_RechazaSiSeSuperaElLimiteDeSaldo()
     {
         var tarjeta = new Tarjeta(1);
-        tarjeta.cargaRealizada(30000);
+        tarjeta.Cargar(30000);
 
-        var resultado = tarjeta.cargaRealizada(15000);
+        var resultado = tarjeta.Cargar(15000);
 
         Assert.That(resultado, Is.False);
         Assert.That(tarjeta.saldo, Is.EqualTo(30000));
@@ -51,7 +51,7 @@ public class TarjetaTests
     public void Descontar_RestaElMontoSiHaySaldoSuficiente()
     {
         var tarjeta = new Tarjeta(1);
-        tarjeta.cargaRealizada(2000);
+        tarjeta.Cargar(2000);
 
         var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 

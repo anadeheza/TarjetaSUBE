@@ -20,7 +20,7 @@ namespace Sube
             this.saldo = 0;
         }
 
-        public bool cargaRealizada(int monto)
+        public bool Cargar(int monto)
         {
             if(!MontosValidos.Contains(monto)) return false; 
             if(saldo + monto > SaldoMax) return false;
