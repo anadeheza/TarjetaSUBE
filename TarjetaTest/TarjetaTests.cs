@@ -70,6 +70,7 @@ public class TarjetaTests
         Assert.That(tarjeta.Saldo, Is.EqualTo(-Tarjeta.TarifaBasica));
     }
 
+    [Test]
     public void Descontar_NoPermiteBajarDelSaldoMinimo()
     {
         var tarjeta = new Tarjeta(1);
@@ -77,7 +78,19 @@ public class TarjetaTests
 
         var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
-
+        Assert.That(resultado, Is.False);
+        Assert.That(tarjeta.Saldo, Is.EqualTo(-Tarjeta.TarifaBasica));
     }
 
+    [Test]
+    public void Cargar_DescuentaElViajePlus() 
+    {
+        var tarjeta = new Tarjeta(1);
+        tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+
+        var resultado = tarjeta.Cargar(2000);
+
+        Assert.That(resultado, Is.True);
+        Assert.That(tarjeta.Saldo, Is.EqualTo(2000-Tarjeta.TarifaBasica));
+    }
 }
