@@ -15,7 +15,7 @@ public class ColectivoTests
 
         Assert.That(boleto, Is.Not.Null);
         Assert.That(boleto!.Precio, Is.EqualTo(Tarjeta.TarifaBasica));
-        Assert.That(tarjeta.Saldo, Is.EqualTo(2000 - Tarjeta.TarifaBasica));
+        Assert.That(tarjeta.saldo, Is.EqualTo(2000 - Tarjeta.TarifaBasica));
     }
 
     [Test]

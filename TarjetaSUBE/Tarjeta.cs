@@ -5,7 +5,7 @@ namespace Sube
     public class Tarjeta
     {
         public const int TarifaBasica = 1580;
-        private const int SaldoMax = 30000;
+        private const int SaldoMax = 40000;
         private static int[] MontosValidos = { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
 
         public int Id { get; set; }
