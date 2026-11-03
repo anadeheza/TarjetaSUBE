@@ -14,11 +14,16 @@ public class Colectivo
 
     public Boleto? PagarCon(Tarjeta tarjeta)
     {
+        int saldoAnterior = tarjeta.Saldo;
         int precio = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
 
         if (!tarjeta.pagoRealizado(Tarjeta.TarifaBasica))
             return null;
 
-        return new Boleto(this, tarjeta, precio);
+        int totalAbonado = precio;
+        if (saldoAnterior < 0)
+            totalAbonado = precio - saldoAnterior;
+
+        return new Boleto(this, tarjeta, precio, totalAbonado, tarjeta.Saldo);
     }
 }
