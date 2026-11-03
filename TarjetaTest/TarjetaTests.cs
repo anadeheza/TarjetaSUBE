@@ -4,6 +4,16 @@ namespace TarjetaTest;
 
 public class TarjetaTests
 {
+    private TarjetaTipo tipoNormal = null!;
+    private TarjetaTipo tipoMedioBoleto = null!;
+
+    [SetUp]
+    public void Setup()
+    {
+        tipoNormal = new TarjetaTipo(1, "Normal", 1.0m);
+        tipoMedioBoleto = new TarjetaTipo(2, "Medio boleto estudiantil", 0.5m);
+    }
+
     [TestCase(2000)]
     [TestCase(3000)]
     [TestCase(4000)]
@@ -91,6 +101,69 @@ public class TarjetaTests
         var resultado = tarjeta.Cargar(2000);
 
         Assert.That(resultado, Is.True);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(2000-Tarjeta.TarifaBasica));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(2000 - Tarjeta.TarifaBasica));
+    }
+
+    [Test]
+    public void BoletoUsoFrecuente_Viajes1a29_PagaTarifaCompleta()
+    {
+        var tarjeta = new Tarjeta(1, tipoNormal);
+
+        for (int i = 0; i < 28; i++)
+        {
+            tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+        }
+
+        int costoViaje29 = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
+
+        Assert.That(costoViaje29, Is.EqualTo(Tarjeta.TarifaBasica));
+    }
+
+    [Test]
+    public void BoletoUsoFrecuente_Viajes30a79_AplicaDescuento20PorCiento()
+    {
+        var tarjeta = new Tarjeta(1, tipoNormal);
+
+        for (int i = 0; i < 29; i++)
+        {
+            tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+        }
+
+        int costoEsperado = (int)Math.Round(Tarjeta.TarifaBasica * 0.80);
+        int costoViaje30 = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
+
+        Assert.That(costoViaje30, Is.EqualTo(costoEsperado));
+    }
+
+    [Test]
+    public void BoletoUsoFrecuente_Viajes80EnAdelante_AplicaDescuento25PorCiento()
+    {
+        var tarjeta = new Tarjeta(1, tipoNormal);
+
+        for (int i = 0; i < 79; i++)
+        {
+            tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+        }
+
+        int costoEsperado = (int)Math.Round(Tarjeta.TarifaBasica * 0.75);
+        int costoViaje80 = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
+
+        Assert.That(costoViaje80, Is.EqualTo(costoEsperado));
+    }
+
+    [Test]
+    public void BoletoUsoFrecuente_NoAplicaATarjetasQueNoSeanNormales()
+    {
+        var tarjeta = new Tarjeta(2, tipoMedioBoleto);
+
+        for (int i = 0; i < 35; i++)
+        {
+            tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+        }
+
+        int costoEsperado = (int)Math.Round(Tarjeta.TarifaBasica * 0.5m);
+        int costoCalculado = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
+
+        Assert.That(costoCalculado, Is.EqualTo(costoEsperado));
     }
 }
