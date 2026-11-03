@@ -19,6 +19,8 @@ public class Colectivo
         if (!tarjeta.PuedeViajar(ahora))
             return null;
 
+        tarjeta.ActualizarDia(ahora);
+
         int saldoAnterior = tarjeta.Saldo;
         int precio = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
 
