@@ -16,6 +16,9 @@ namespace Sube
         public int Id_Tipo { get; set; }
         public TarjetaTipo Tipo { get; set; } = null!;
 
+        public DateTime? UltimoViaje { get; private set; }
+        public bool EsMedioBoleto => Tipo?.Nombre == "Medio boleto estudiantil";
+
         public Tarjeta() { }
 
         public Tarjeta(int id)
@@ -51,7 +54,7 @@ namespace Sube
         }
 
 
-        public bool pagoRealizado(int monto)
+        public bool pagoRealizado(int monto, DateTime? fecha = null)
         {
             int costo = CalcularBoleto(monto);
 
@@ -61,7 +64,16 @@ namespace Sube
             if ((saldo - costo) < SaldoMin) return false;
 
             saldo -= costo;
+            UltimoViaje = fecha ?? DateTime.Now;
             return true;
+        }
+
+        public bool PuedeViajar(DateTime ahora)
+        {
+            if (!EsMedioBoleto) return true;
+            if (UltimoViaje is null) return true;
+
+            return ahora - UltimoViaje.Value >= TimeSpan.FromMinutes(5);
         }
     }
 }
