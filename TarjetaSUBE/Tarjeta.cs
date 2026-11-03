@@ -18,6 +18,7 @@ namespace Sube
 
         public DateTime? UltimoViaje { get; private set; }
         public bool EsMedioBoleto => Tipo?.Nombre == "Medio boleto estudiantil";
+        public bool EsBoletoGratuito => Tipo?.Nombre == "Boleto gratuito estudiantil";
         public int ViajesHoy { get; private set; }
 
         public Tarjeta() { }
@@ -46,8 +47,10 @@ namespace Sube
         {
             if (Tipo is null)
                 return tarifaBase;
-            if (EsMedioBoleto && ViajesHoy >= 2)
+            if ((EsMedioBoleto || EsBoletoGratuito) && ViajesHoy >= 2)
                 return tarifaBase;
+            if (EsBoletoGratuito)
+                return 0;
 
             return (int)Math.Round(tarifaBase * Tipo.Descuento);
         }
@@ -71,12 +74,20 @@ namespace Sube
             int costo = CalcularBoleto(monto);
 
             if (costo == 0)
-                return true;
+            {
+                if (EsBoletoGratuito)
+                {
+                    ViajesHoy++;
+                    UltimoViaje = ahora;
+                }
 
+                return true;
+            }
             if ((saldo - costo) < SaldoMin) return false;
 
             saldo -= costo;
-            if (EsMedioBoleto)
+
+            if(EsMedioBoleto || EsBoletoGratuito)
                 ViajesHoy++;
             UltimoViaje = ahora;
             return true;
