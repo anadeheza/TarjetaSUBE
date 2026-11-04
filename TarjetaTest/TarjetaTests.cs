@@ -52,35 +52,37 @@ public class TarjetaTests
     public void Descontar_RestaElMontoSiHaySaldoSuficiente()
     {
         var tarjeta = new Tarjeta(1);
-        tarjeta.Cargar(2000);
+        tarjeta.Cargar(3000);
 
         var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
         Assert.That(resultado, Is.True);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(2000 - Tarjeta.TarifaBasica));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(3000 - Tarjeta.TarifaBasica));
     }
 
     [Test]
     public void Descontar_PermiteViajePlusSiNoHaySaldo()
     {
         var tarjeta = new Tarjeta(1);
+        tarjeta.Cargar(2000); //minimo de carga
 
-        var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+        tarjeta.pagoRealizado(Tarjeta.TarifaBasica); //cuesta 2150, saldo queda en -150
 
-        Assert.That(resultado, Is.True);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(-Tarjeta.TarifaBasica));
+        var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica); //me resta 2150 mas, si se cobra quedaria en 2300 que supera el limite de 2000, tiene que ser rechazado
+
+        Assert.That(resultado, Is.False);
+        Assert.That(tarjeta.Saldo, Is.EqualTo(-150);
     }
 
     [Test]
     public void Descontar_NoPermiteBajarDelSaldoMinimo()
     {
         var tarjeta = new Tarjeta(1);
-        tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
-        var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+        bool resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
         Assert.That(resultado, Is.False);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(-Tarjeta.TarifaBasica));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(0));
     }
 
     [Test]
@@ -89,9 +91,9 @@ public class TarjetaTests
         var tarjeta = new Tarjeta(1);
         tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
-        var resultado = tarjeta.Cargar(2000);
+        var resultado = tarjeta.Cargar(3000);
 
         Assert.That(resultado, Is.True);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(2000-Tarjeta.TarifaBasica));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(3000-Tarjeta.TarifaBasica));
     }
 }
