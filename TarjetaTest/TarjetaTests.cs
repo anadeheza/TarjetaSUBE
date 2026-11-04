@@ -36,15 +36,16 @@ public class TarjetaTests
     }
 
     [Test]
-    public void Cargar_RechazaSiSeSuperaElLimiteDeSaldo()
+    public void Cargar_AceptaUnaCargaQueAntesSuperabaElTopeViejo()
     {
         var tarjeta = new Tarjeta(1);
         tarjeta.Cargar(30000);
 
         var resultado = tarjeta.Cargar(15000);
 
-        Assert.That(resultado, Is.False);
-        Assert.That(tarjeta.saldo, Is.EqualTo(30000));
+        Assert.That(resultado, Is.True);
+        Assert.That(tarjeta.Saldo, Is.EqualTo(45000));
+        Assert.That(tarjeta.SaldoPendiente, Is.EqualTo(0));
     }
 
     [Test]
