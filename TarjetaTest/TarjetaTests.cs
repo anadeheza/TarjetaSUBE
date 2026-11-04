@@ -21,7 +21,7 @@ public class TarjetaTests
         var resultado = tarjeta.Cargar(monto);
 
         Assert.That(resultado, Is.True);
-        Assert.That(tarjeta.saldo, Is.EqualTo(monto));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(monto));
     }
 
     [Test]
@@ -32,7 +32,7 @@ public class TarjetaTests
         var resultado = tarjeta.Cargar(1500);
 
         Assert.That(resultado, Is.False);
-        Assert.That(tarjeta.saldo, Is.EqualTo(0));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(0));
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class TarjetaTests
         var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
         Assert.That(resultado, Is.True);
-        Assert.That(tarjeta.saldo, Is.EqualTo(2000 - Tarjeta.TarifaBasica));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(2000 - Tarjeta.TarifaBasica));
     }
 
     [Test]

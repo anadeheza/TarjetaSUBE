@@ -32,4 +32,17 @@ public class SaldoPendienteTests
         Assert.That(tarjeta.Saldo, Is.EqualTo(Tarjeta.SaldoMax));
         Assert.That(tarjeta.SaldoPendiente, Is.EqualTo(4000 - Tarjeta.TarifaBasica));
     }
+
+    [Test]
+    public void AcreditarCarga_NoPasaDelMaximoSiNoHayEspacio()
+    {
+        var tarjeta = new Tarjeta(1);
+        tarjeta.Cargar(30000);
+        tarjeta.Cargar(30000);
+
+        tarjeta.AcreditarCarga();
+
+        Assert.That(tarjeta.Saldo, Is.EqualTo(Tarjeta.SaldoMax));
+        Assert.That(tarjeta.SaldoPendiente, Is.EqualTo(4000));
+    }
 }

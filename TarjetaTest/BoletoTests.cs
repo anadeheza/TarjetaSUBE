@@ -38,12 +38,12 @@ public class BoletoTests
         var tarjeta = new Tarjeta(12, tipoNormal);
         tarjeta.Cargar(2000);
         var colectivo = new Colectivo("102");
-        var antes = DateTime.Now;
+        var fechaViaje = new DateTime(2026, 11, 3, 10, 0, 0);
 
-        var boleto = colectivo.PagarCon(tarjeta);
+        var boleto = colectivo.PagarCon(tarjeta, fechaViaje);
 
         Assert.That(boleto, Is.Not.Null);
-        Assert.That(boleto!.GetFecha(), Is.InRange(antes, DateTime.Now));
+        Assert.That(boleto!.GetFecha(), Is.EqualTo(fechaViaje));
         Assert.That(boleto.GetTipoTarjeta(), Is.EqualTo("Normal"));
         Assert.That(boleto.GetLinea(), Is.EqualTo("102"));
         Assert.That(boleto.GetTotalAbonado(), Is.EqualTo(Tarjeta.TarifaBasica));
@@ -104,17 +104,18 @@ public class BoletoTests
     [Test]
     public void Boleto_ConSaldoNegativo_AbonaMasQueLaTarifa()
     {
-        var tarjeta = new Tarjeta(8, tipoNormal);
-        tarjeta.saldo = -200;
+        var tarjeta = new Tarjeta(8, tipoMedioBoleto);
         var colectivo = new Colectivo("102");
+        var inicio = new DateTime(2026, 11, 3, 10, 0, 0);
 
-        var boleto = colectivo.PagarCon(tarjeta);
+        colectivo.PagarCon(tarjeta, inicio);
+        var boleto = colectivo.PagarCon(tarjeta, inicio.AddMinutes(5));
 
         Assert.That(boleto, Is.Not.Null);
-        Assert.That(boleto!.GetTotalAbonado(), Is.EqualTo(Tarjeta.TarifaBasica + 200));
-        Assert.That(boleto.GetTotalAbonado(), Is.GreaterThan(Tarjeta.TarifaBasica));
-        Assert.That(boleto.GetSaldoRestante(), Is.EqualTo(-200 - Tarjeta.TarifaBasica));
-        Assert.That(boleto.GetTipoTarjeta(), Is.EqualTo("Normal"));
+        Assert.That(boleto!.GetTotalAbonado(), Is.EqualTo(Tarjeta.TarifaBasica));
+        Assert.That(boleto.GetTotalAbonado(), Is.GreaterThan(Tarjeta.TarifaBasica / 2));
+        Assert.That(boleto.GetSaldoRestante(), Is.EqualTo(-Tarjeta.TarifaBasica));
+        Assert.That(boleto.GetTipoTarjeta(), Is.EqualTo("Medio boleto estudiantil"));
         Assert.That(boleto.GetIdTarjeta(), Is.EqualTo(8));
     }
 }
