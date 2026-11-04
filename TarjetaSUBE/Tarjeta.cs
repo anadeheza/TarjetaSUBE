@@ -18,6 +18,7 @@ namespace Sube
 
         public DateTime? UltimoViaje { get; private set; }
 
+        public bool EsNormal => Tipo is null|| Tipo.Nombre == "Normal";
         public bool EsMedioBoleto => Tipo?.Nombre == "Medio boleto estudiantil";
         public bool EsBoletoGratuito => Tipo?.Nombre == "Boleto gratuito estudiantil";
 
@@ -99,6 +100,15 @@ namespace Sube
 
         public bool PuedeViajar(DateTime ahora)
         {
+            if (!EsNormal)
+            {
+                bool esDiaHabil = ahora.DayOfWeek != DayOfWeek.Saturday && ahora.DayOfWeek != DayOfWeek.Sunday;
+                bool esHorarioPermitido = ahora.Hour >= 6 && ahora.Hour < 22;
+
+                if (!esDiaHabil || !esHorarioPermitido)
+                    return false;
+            }
+
             if (!EsMedioBoleto) return true;
             if (UltimoViaje is null) return true;
 

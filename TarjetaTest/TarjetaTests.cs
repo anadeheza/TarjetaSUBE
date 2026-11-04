@@ -68,10 +68,10 @@ public class TarjetaTests
 
         tarjeta.pagoRealizado(Tarjeta.TarifaBasica); //cuesta 2150, saldo queda en -150
 
-        var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica); //me resta 2150 mas, si se cobra quedaria en 2300 que supera el limite de 2000, tiene que ser rechazado
+        var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica); //me resta 2150 mas, si se cobra quedaria en -2300 que supera el limite de -2000, tiene que ser rechazado
 
         Assert.That(resultado, Is.False);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(-150);
+        Assert.That(tarjeta.Saldo, Is.EqualTo(-150));
     }
 
     [Test]
@@ -89,11 +89,12 @@ public class TarjetaTests
     public void Cargar_DescuentaElViajePlus() 
     {
         var tarjeta = new Tarjeta(1);
-        tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+        tarjeta.Cargar(2000);
+        tarjeta.pagoRealizado(Tarjeta.TarifaBasica); //saldo -150
 
-        var resultado = tarjeta.Cargar(3000);
+        var resultado = tarjeta.Cargar(3000); //3000 - 150 = 2850
 
         Assert.That(resultado, Is.True);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(3000-Tarjeta.TarifaBasica));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(2850));
     }
 }
