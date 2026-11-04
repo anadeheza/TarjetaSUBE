@@ -4,7 +4,7 @@ namespace Sube
 {
     public class Tarjeta
     {
-        public const int TarifaBasica = 1580;
+        public const int TarifaBasica = 2150;
         public const int SaldoMax = 56000;
         private const int SaldoMin = -2000;
         private static int[] MontosValidos = { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
@@ -18,6 +18,7 @@ namespace Sube
 
         public DateTime? UltimoViaje { get; private set; }
 
+        public bool EsNormal => Tipo is null|| Tipo.Nombre == "Normal";
         public bool EsMedioBoleto => Tipo?.Nombre == "Medio boleto estudiantil";
         public bool EsBoletoGratuito => Tipo?.Nombre == "Boleto gratuito estudiantil";
 
@@ -99,6 +100,15 @@ namespace Sube
 
         public bool PuedeViajar(DateTime ahora)
         {
+            if (!EsNormal)
+            {
+                bool esDiaHabil = ahora.DayOfWeek != DayOfWeek.Saturday && ahora.DayOfWeek != DayOfWeek.Sunday;
+                bool esHorarioPermitido = ahora.Hour >= 6 && ahora.Hour < 22;
+
+                if (!esDiaHabil || !esHorarioPermitido)
+                    return false;
+            }
+
             if (!EsMedioBoleto) return true;
             if (UltimoViaje is null) return true;
 
