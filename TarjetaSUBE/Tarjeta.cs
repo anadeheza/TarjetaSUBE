@@ -5,21 +5,25 @@ namespace Sube
     public class Tarjeta
     {
         public const int TarifaBasica = 1580;
-        private const int SaldoMax = 40000;
+        public const int SaldoMax = 56000;
         private const int SaldoMin = -2000;
         private static int[] MontosValidos = { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
 
         public int Id { get; set; }
-        public int saldo;
+        private int saldo;
         public int Saldo => saldo;
 
         public int Id_Tipo { get; set; }
         public TarjetaTipo Tipo { get; set; } = null!;
 
         public DateTime? UltimoViaje { get; private set; }
+
         public bool EsMedioBoleto => Tipo?.Nombre == "Medio boleto estudiantil";
         public bool EsBoletoGratuito => Tipo?.Nombre == "Boleto gratuito estudiantil";
+
         public int ViajesHoy { get; private set; }
+
+        public int SaldoPendiente { get; private set; }
 
         public Tarjeta() { }
 
@@ -57,11 +61,10 @@ namespace Sube
 
         public bool Cargar(int monto)
         {
-            if(!MontosValidos.Contains(monto)) return false; 
-            if(saldo + monto > SaldoMax) return false;
+            if (!MontosValidos.Contains(monto)) return false;
 
-            saldo += monto;
-
+            SaldoPendiente += monto;
+            AcreditarCarga();
             return true;
         }
 
@@ -86,8 +89,9 @@ namespace Sube
             if ((saldo - costo) < SaldoMin) return false;
 
             saldo -= costo;
+            AcreditarCarga();
 
-            if(EsMedioBoleto || EsBoletoGratuito)
+            if (EsMedioBoleto || EsBoletoGratuito)
                 ViajesHoy++;
             UltimoViaje = ahora;
             return true;
@@ -100,5 +104,17 @@ namespace Sube
 
             return ahora - UltimoViaje.Value >= TimeSpan.FromMinutes(5);
         }
+
+        public void AcreditarCarga()
+        {
+            int espacio = SaldoMax - saldo;
+            if (espacio <= 0 || SaldoPendiente <= 0)
+                return;
+
+            int aAcreditar = Math.Min(espacio, SaldoPendiente);
+            saldo += aAcreditar;
+            SaldoPendiente -= aAcreditar;
+        }
+
     }
 }

@@ -99,4 +99,35 @@ public class MedioBoletoTests
         Assert.That(alDiaSiguiente, Is.Not.Null);
         Assert.That(alDiaSiguiente!.GetTotalAbonado(), Is.EqualTo(Tarjeta.TarifaBasica / 2));
     }
+
+    [Test]
+    public void PuedeViajar_RespetaLos5MinutosEnMedioBoleto()
+    {
+        var tarjeta = new Tarjeta(1, tipoMedioBoleto);
+        tarjeta.Cargar(5000);
+        var inicio = new DateTime(2026, 11, 3, 10, 0, 0);
+
+        Assert.That(tarjeta.PuedeViajar(inicio), Is.True);
+        tarjeta.pagoRealizado(Tarjeta.TarifaBasica, inicio);
+
+        Assert.That(tarjeta.PuedeViajar(inicio.AddMinutes(4)), Is.False);
+        Assert.That(tarjeta.PuedeViajar(inicio.AddMinutes(5)), Is.True);
+    }
+
+    [Test]
+    public void ActualizarDia_ReseteaLosViajesAlCambiarElDia()
+    {
+        var tarjeta = new Tarjeta(1, tipoMedioBoleto);
+        tarjeta.Cargar(5000);
+        var inicio = new DateTime(2026, 11, 3, 10, 0, 0);
+
+        tarjeta.pagoRealizado(Tarjeta.TarifaBasica, inicio);
+        tarjeta.pagoRealizado(Tarjeta.TarifaBasica, inicio.AddMinutes(5));
+
+        Assert.That(tarjeta.ViajesHoy, Is.EqualTo(2));
+
+        tarjeta.ActualizarDia(inicio.AddDays(1));
+
+        Assert.That(tarjeta.ViajesHoy, Is.EqualTo(0));
+    }
 }

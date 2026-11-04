@@ -18,14 +18,14 @@ public class Boleto
 
     public Boleto() { }
 
-    public Boleto(Colectivo colectivo, Tarjeta tarjeta, int precio, int? totalAbonado = null, int? saldoRestante = null)
+    public Boleto(Colectivo colectivo, Tarjeta tarjeta, int precio, int? totalAbonado = null, int? saldoRestante = null, DateTime? fecha = null)
     {
         Colectivo = colectivo;
         Tarjeta = tarjeta;
         ColectivoId = colectivo.Id;
         TarjetaId = tarjeta.Id;
         Precio = precio;
-        Fecha = DateTime.Now;
+        Fecha = fecha ?? DateTime.Now;
         Linea = colectivo.Linea;
         TipoTarjeta = tarjeta.Tipo?.Nombre ?? "Normal";
         TotalAbonado = totalAbonado ?? precio;

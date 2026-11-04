@@ -31,6 +31,6 @@ public class Colectivo
         if (saldoAnterior < 0)
             totalAbonado = precio - saldoAnterior;
 
-        return new Boleto(this, tarjeta, precio, totalAbonado, tarjeta.Saldo);
+        return new Boleto(this, tarjeta, precio, totalAbonado, tarjeta.Saldo, ahora);
     }
 }
