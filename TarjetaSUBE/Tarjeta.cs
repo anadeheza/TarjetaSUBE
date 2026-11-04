@@ -16,6 +16,11 @@ namespace Sube
         public int Id_Tipo { get; set; }
         public TarjetaTipo Tipo { get; set; } = null!;
 
+        public DateTime? UltimoViaje { get; private set; }
+        public bool EsMedioBoleto => Tipo?.Nombre == "Medio boleto estudiantil";
+        public bool EsBoletoGratuito => Tipo?.Nombre == "Boleto gratuito estudiantil";
+        public int ViajesHoy { get; private set; }
+
         public Tarjeta() { }
 
         public Tarjeta(int id)
@@ -32,10 +37,20 @@ namespace Sube
             Id_Tipo = tipo.Id;
         }
 
+        public void ActualizarDia(DateTime ahora)
+        {
+            if (UltimoViaje is null || UltimoViaje.Value.Date != ahora.Date)
+                ViajesHoy = 0;
+        }
+
         public int CalcularBoleto(int tarifaBase)
         {
             if (Tipo is null)
                 return tarifaBase;
+            if ((EsMedioBoleto || EsBoletoGratuito) && ViajesHoy >= 2)
+                return tarifaBase;
+            if (EsBoletoGratuito)
+                return 0;
 
             return (int)Math.Round(tarifaBase * Tipo.Descuento);
         }
@@ -51,17 +66,39 @@ namespace Sube
         }
 
 
-        public bool pagoRealizado(int monto)
+        public bool pagoRealizado(int monto, DateTime? fecha = null)
         {
+            var ahora = fecha ?? DateTime.Now;
+            ActualizarDia(ahora);
+
             int costo = CalcularBoleto(monto);
 
             if (costo == 0)
-                return true;
+            {
+                if (EsBoletoGratuito)
+                {
+                    ViajesHoy++;
+                    UltimoViaje = ahora;
+                }
 
+                return true;
+            }
             if ((saldo - costo) < SaldoMin) return false;
 
             saldo -= costo;
+
+            if(EsMedioBoleto || EsBoletoGratuito)
+                ViajesHoy++;
+            UltimoViaje = ahora;
             return true;
+        }
+
+        public bool PuedeViajar(DateTime ahora)
+        {
+            if (!EsMedioBoleto) return true;
+            if (UltimoViaje is null) return true;
+
+            return ahora - UltimoViaje.Value >= TimeSpan.FromMinutes(5);
         }
     }
 }

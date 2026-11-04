@@ -12,12 +12,19 @@ public class Colectivo
         Linea = linea;
     }
 
-    public Boleto? PagarCon(Tarjeta tarjeta)
+    public Boleto? PagarCon(Tarjeta tarjeta, DateTime? fecha = null)
     {
+        var ahora = fecha ?? DateTime.Now;
+
+        if (!tarjeta.PuedeViajar(ahora))
+            return null;
+
+        tarjeta.ActualizarDia(ahora);
+
         int saldoAnterior = tarjeta.Saldo;
         int precio = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
 
-        if (!tarjeta.pagoRealizado(Tarjeta.TarifaBasica))
+        if (!tarjeta.pagoRealizado(Tarjeta.TarifaBasica, ahora))
             return null;
 
         int totalAbonado = precio;
