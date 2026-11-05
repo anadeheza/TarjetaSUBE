@@ -29,6 +29,7 @@ namespace Sube
         public bool TieneBiciFuera => RetiroBici is not null;
 
         public int ViajesHoy { get; private set; }
+
         public decimal SaldoPendiente { get; private set; }
 
         public int ViajesDelMes { get; private set; }
@@ -127,6 +128,12 @@ namespace Sube
             return true;
         }
 
+        public bool pagoRealizado(int monto)
+            => pagoRealizado(monto, string.Empty, null);
+
+        public bool pagoRealizado(int monto, DateTime fecha)
+            => pagoRealizado(monto, string.Empty, fecha);
+
         public bool pagoRealizado(int monto, string lineaActual, DateTime? fecha = null)
         {
             var ahora = fecha ?? DateTime.Now;
@@ -136,4 +143,83 @@ namespace Sube
 
             if (costo == 0)
             {
-                Ultimo
+                UltimoViaje = ahora;
+                UltimaLineaViajada = lineaActual;
+
+                if (EsBoletoGratuito)
+                    ViajesHoy++;
+
+                return true;
+            }
+
+            if ((saldo - costo) < SaldoMin) return false;
+
+            saldo -= costo;
+            AcreditarCarga();
+
+            if (EsNormal)
+                ViajesDelMes++;
+            if (EsMedioBoleto || EsBoletoGratuito)
+                ViajesHoy++;
+
+            UltimoViaje = ahora;
+            UltimaLineaViajada = lineaActual;
+            return true;
+        }
+
+        public bool DescontarMontoFijo(decimal monto)
+        {
+            if (monto < 0)
+                return false;
+
+            if ((saldo - monto) < SaldoMin)
+                return false;
+
+            saldo -= monto;
+            AcreditarCarga();
+            return true;
+        }
+
+        public void RegistrarRetiroBici(DateTime ahora)
+        {
+            MultasBiciPendientes = 0;
+            RetiroBici = ahora;
+        }
+
+        public void RegistrarDevolucionBici(DateTime ahora, TimeSpan tiempoMaximo, decimal multa)
+        {
+            if (RetiroBici is not null && ahora - RetiroBici.Value > tiempoMaximo)
+                MultasBiciPendientes += multa;
+
+            RetiroBici = null;
+        }
+
+        public bool PuedeViajar(DateTime ahora)
+        {
+            if (!EsNormal)
+            {
+                bool esDiaHabil = ahora.DayOfWeek != DayOfWeek.Saturday && ahora.DayOfWeek != DayOfWeek.Sunday;
+                bool esHorarioPermitido = ahora.Hour >= 6 && ahora.Hour < 22;
+
+                if (!esDiaHabil || !esHorarioPermitido)
+                    return false;
+            }
+
+            if (!EsMedioBoleto) return true;
+            if (UltimoViaje is null) return true;
+
+            return ahora - UltimoViaje.Value >= TimeSpan.FromMinutes(5);
+        }
+
+        public void AcreditarCarga()
+        {
+            decimal espacio = SaldoMax - saldo;
+            if (espacio <= 0 || SaldoPendiente <= 0)
+                return;
+
+            decimal aAcreditar = Math.Min(espacio, SaldoPendiente);
+            saldo += aAcreditar;
+            SaldoPendiente -= aAcreditar;
+        }
+    }
+}
