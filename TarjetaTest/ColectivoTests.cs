@@ -22,12 +22,13 @@ public class ColectivoTests
     public void PagarCon_NoViajaSiSuperaElSaldoMinimo()
     {
         var tarjeta = new Tarjeta(1);
+        tarjeta.Cargar(2000);
         var colectivo = new Colectivo("102");
         colectivo.PagarCon(tarjeta);
 
         var boleto = colectivo.PagarCon(tarjeta);
 
         Assert.That(boleto, Is.Null);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(-Tarjeta.TarifaBasica));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(2000 - Tarjeta.TarifaBasica));
     }
 }

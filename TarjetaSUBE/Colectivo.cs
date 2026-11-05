@@ -1,37 +1,38 @@
-namespace Sube;
-
-public class Colectivo
+namespace Sube
 {
-    public int Id { get; set; }
-    public string Linea { get; set; } = string.Empty;
-
-    public Colectivo() { }
-
-    public Colectivo(string linea)
+    public class Colectivo
     {
-        Linea = linea;
-    }
+        public int Id { get; set; }
+        public string Linea { get; set; } = string.Empty;
 
-    public Boleto? PagarCon(Tarjeta tarjeta, DateTime? fecha = null)
-    {
-        var ahora = fecha ?? DateTime.Now;
+        public Colectivo() { }
 
-        if (!tarjeta.PuedeViajar(ahora))
-            return null;
+        public Colectivo(string linea)
+        {
+            Linea = linea;
+        }
 
-        tarjeta.ActualizarDia(ahora);
+        public Boleto? PagarCon(Tarjeta tarjeta, DateTime? fecha = null)
+        {
+            var ahora = fecha ?? DateTime.Now;
 
-        bool esTrasbordo = tarjeta.EsTrasbordo(Linea, ahora);
-        int saldoAnterior = tarjeta.Saldo;
-        int precio = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica, Linea, ahora);
+            if (!tarjeta.PuedeViajar(ahora))
+                return null;
 
-        if (!tarjeta.pagoRealizado(Tarjeta.TarifaBasica, Linea, ahora))
-            return null;
+            tarjeta.ActualizarDia(ahora);
 
-        int totalAbonado = precio;
-        if (saldoAnterior < 0 && precio > 0)
-            totalAbonado = precio - saldoAnterior;
+            bool esTrasbordo = tarjeta.EsTrasbordo(Linea, ahora);
+            int saldoAnterior = tarjeta.Saldo;
+            int precio = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica, Linea, ahora);
 
-        return new Boleto(colectivo: this, tarjeta: tarjeta, precio: precio, totalAbonado: totalAbonado, saldoRestante: tarjeta.Saldo, fecha: ahora, esTrasbordo: esTrasbordo);
+            if (!tarjeta.pagoRealizado(Tarjeta.TarifaBasica, Linea, ahora))
+                return null;
+
+            int totalAbonado = precio;
+            if (saldoAnterior < 0 && precio > 0)
+                totalAbonado = precio - saldoAnterior;
+
+            return new Boleto(colectivo: this, tarjeta: tarjeta, precio: precio, totalAbonado: totalAbonado, saldoRestante: tarjeta.Saldo, fecha: ahora, esTrasbordo: esTrasbordo);
+        }
     }
 }
