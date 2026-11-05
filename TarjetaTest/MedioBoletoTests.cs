@@ -23,7 +23,7 @@ public class MedioBoletoTests
         var inicio = new DateTime(2026, 11, 3, 10, 0, 0);
 
         var primero = colectivo.PagarCon(tarjeta, inicio);
-        int saldoDespuesDelPrimero = tarjeta.Saldo;
+        decimal saldoDespuesDelPrimero = tarjeta.Saldo;
 
         var segundo = colectivo.PagarCon(tarjeta, inicio.AddMinutes(4));
 
