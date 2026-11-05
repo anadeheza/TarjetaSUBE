@@ -22,7 +22,7 @@ public class Colectivo
         tarjeta.ActualizarDia(ahora);
 
         int saldoAnterior = tarjeta.Saldo;
-        int precio = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
+        int precio = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica, ahora);
 
         if (!tarjeta.pagoRealizado(Tarjeta.TarifaBasica, ahora))
             return null;

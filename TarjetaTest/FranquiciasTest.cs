@@ -37,8 +37,8 @@ public class TarjetaFranquiciaTests
         int costoNormal = tarjetaNormal.CalcularBoleto(Tarjeta.TarifaBasica);
         int costoMedio = tarjetaMedio.CalcularBoleto(Tarjeta.TarifaBasica);
 
-        Assert.That(costoNormal, Is.EqualTo(1580), "El pasaje normal deberia costar la tarifa base completa.");
-        Assert.That(costoMedio, Is.EqualTo(790), "El medio boleto deberia costar exactamente la mitad.");
+        Assert.That(costoNormal, Is.EqualTo(Tarjeta.TarifaBasica), "El pasaje normal deberia costar la tarifa base completa.");
+        Assert.That(costoMedio, Is.EqualTo(Tarjeta.TarifaBasica / 2), "El medio boleto deberia costar exactamente la mitad.");
         Assert.That(costoMedio, Is.EqualTo(costoNormal / 2), "El costo del medio boleto debe coincidir con costoNormal / 2.");
     }
 }
