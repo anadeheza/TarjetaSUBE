@@ -18,7 +18,7 @@ namespace Sube
 
         public DateTime? UltimoViaje { get; private set; }
 
-        public bool EsNormal => Tipo is null|| Tipo.Nombre == "Normal";
+        public bool EsNormal => Tipo is null || Tipo.Nombre == "Normal";
         public bool EsMedioBoleto => Tipo?.Nombre == "Medio boleto estudiantil";
         public bool EsBoletoGratuito => Tipo?.Nombre == "Boleto gratuito estudiantil";
 
@@ -29,6 +29,10 @@ namespace Sube
         public int ViajesHoy { get; private set; }
 
         public decimal SaldoPendiente { get; private set; }
+
+        public int ViajesDelMes { get; private set; }
+        private int ultimoMesViaje = -1;
+        private int ultimoAñoViaje = -1;
 
         public Tarjeta() { }
 
@@ -52,14 +56,41 @@ namespace Sube
                 ViajesHoy = 0;
         }
 
-        public int CalcularBoleto(int tarifaBase)
+        private void ActualizarContadorDeViajes(DateTime ahora)
         {
-            if (Tipo is null)
-                return tarifaBase;
+            if (ahora.Month != ultimoMesViaje || ahora.Year != ultimoAñoViaje)
+            {
+                ViajesDelMes = 0;
+                ultimoMesViaje = ahora.Month;
+                ultimoAñoViaje = ahora.Year;
+            }
+        }
+
+        public int CalcularBoleto(int tarifaBase, DateTime? fecha = null)
+        {
+            var ahora = fecha ?? DateTime.Now;
+            ActualizarContadorDeViajes(ahora);
+
             if ((EsMedioBoleto || EsBoletoGratuito) && ViajesHoy >= 2)
                 return tarifaBase;
             if (EsBoletoGratuito)
                 return 0;
+
+            if (EsNormal)
+            {
+                double costo = tarifaBase;
+                int siguiente = ViajesDelMes + 1;
+
+                if (siguiente >= 80)
+                    costo *= 0.75;
+                else if (siguiente >= 30)
+                    costo *= 0.80;
+
+                return (int)Math.Round(costo);
+            }
+
+            if (Tipo is null)
+                return tarifaBase;
 
             return (int)Math.Round(tarifaBase * Tipo.Descuento);
         }
@@ -78,7 +109,7 @@ namespace Sube
             var ahora = fecha ?? DateTime.Now;
             ActualizarDia(ahora);
 
-            int costo = CalcularBoleto(monto);
+            int costo = CalcularBoleto(monto, ahora);
 
             if (costo == 0)
             {
@@ -95,6 +126,8 @@ namespace Sube
             saldo -= costo;
             AcreditarCarga();
 
+            if (EsNormal)
+                ViajesDelMes++;
             if (EsMedioBoleto || EsBoletoGratuito)
                 ViajesHoy++;
             UltimoViaje = ahora;
