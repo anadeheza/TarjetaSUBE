@@ -5,6 +5,10 @@ namespace Sube
     public class Tarjeta
     {
         public const int TarifaBasica = 1580;
+
+        public const float TarifaBici = 2418.75f;
+        public const int TarifaBiciMulta = 1250;
+
         public const int SaldoMax = 56000;
         private const int SaldoMin = -2000;
         private static int[] MontosValidos = { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
@@ -20,6 +24,10 @@ namespace Sube
 
         public bool EsMedioBoleto => Tipo?.Nombre == "Medio boleto estudiantil";
         public bool EsBoletoGratuito => Tipo?.Nombre == "Boleto gratuito estudiantil";
+
+        public DateTime? UltimaBiciSacada { get; private set; }
+        public DateTime? UltimaBiciDejada {  get; private set; }
+        public int horasDeuda = 0;
 
         public int ViajesHoy { get; private set; }
 
@@ -47,7 +55,7 @@ namespace Sube
                 ViajesHoy = 0;
         }
 
-        public int CalcularBoleto(int tarifaBase)
+        public float CalcularBoleto(int tarifaBase)
         {
             if (Tipo is null)
                 return tarifaBase;
@@ -55,7 +63,7 @@ namespace Sube
                 return tarifaBase;
             if (EsBoletoGratuito)
                 return 0;
-
+            
             return (int)Math.Round(tarifaBase * Tipo.Descuento);
         }
 
@@ -115,6 +123,40 @@ namespace Sube
             saldo += aAcreditar;
             SaldoPendiente -= aAcreditar;
         }
+
+
+        public bool BiciSacada()
+        {
+            var ahora = fecha ?? DateTime.Now;
+
+            if(UltimaBiciDejada is null && UltimaBiciSacada is not null)
+            {
+                return false;
+            } else
+            {
+
+            }
+
+
+
+
+            UltimaBiciSacada = ahora;
+            UltimaBiciDejada = null
+
+        }
+
+        public float PagarBici()
+        {
+
+            if (UltimaBiciDejada is null)
+                if (ahora - UltimaBiciSacada >= TimeSpan.FromMinutes(60))
+                {
+                    horasDeuda = (int) Math.Ceiling((ahora - UltimaBiciSacada.Value).TotalHours) - 1;
+                   
+                }
+        }
+
+
 
     }
 }
