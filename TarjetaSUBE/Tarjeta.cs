@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Sube
 {
@@ -17,13 +18,13 @@ namespace Sube
         public TarjetaTipo Tipo { get; set; } = null!;
 
         public DateTime? UltimoViaje { get; private set; }
+        public string? UltimaLineaViajada { get; private set; }
 
-        public bool EsNormal => Tipo is null|| Tipo.Nombre == "Normal";
+        public bool EsNormal => Tipo is null || Tipo.Nombre == "Normal";
         public bool EsMedioBoleto => Tipo?.Nombre == "Medio boleto estudiantil";
         public bool EsBoletoGratuito => Tipo?.Nombre == "Boleto gratuito estudiantil";
 
         public int ViajesHoy { get; private set; }
-
         public int SaldoPendiente { get; private set; }
 
         public Tarjeta() { }
@@ -48,12 +49,37 @@ namespace Sube
                 ViajesHoy = 0;
         }
 
-        public int CalcularBoleto(int tarifaBase)
+        public bool EsTrasbordo(string lineaActual, DateTime ahora)
         {
+            if (UltimoViaje is null || string.IsNullOrEmpty(UltimaLineaViajada))
+                return false;
+
+            if (UltimaLineaViajada == lineaActual)
+                return false;
+
+            if ((ahora - UltimoViaje.Value).TotalMinutes > 60)
+                return false;
+
+            //lunes a sabado de 7:00 a 22:00
+            bool esDiaValido = ahora.DayOfWeek != DayOfWeek.Sunday;
+            bool esHorarioValido = ahora.Hour >= 7 && ahora.Hour < 22;
+
+            return esDiaValido && esHorarioValido;
+        }
+
+        public int CalcularBoleto(int tarifaBase, string? lineaActual = null, DateTime? fecha = null)
+        {
+            var ahora = fecha ?? DateTime.Now;
+
+            if (lineaActual != null && EsTrasbordo(lineaActual, ahora))
+                return 0;
+
             if (Tipo is null)
                 return tarifaBase;
+
             if ((EsMedioBoleto || EsBoletoGratuito) && ViajesHoy >= 2)
                 return tarifaBase;
+
             if (EsBoletoGratuito)
                 return 0;
 
@@ -69,24 +95,24 @@ namespace Sube
             return true;
         }
 
-
-        public bool pagoRealizado(int monto, DateTime? fecha = null)
+        public bool pagoRealizado(int monto, string lineaActual, DateTime? fecha = null)
         {
             var ahora = fecha ?? DateTime.Now;
             ActualizarDia(ahora);
 
-            int costo = CalcularBoleto(monto);
+            int costo = CalcularBoleto(monto, lineaActual, ahora);
 
             if (costo == 0)
             {
+                UltimoViaje = ahora;
+                UltimaLineaViajada = lineaActual;
+
                 if (EsBoletoGratuito)
-                {
                     ViajesHoy++;
-                    UltimoViaje = ahora;
-                }
 
                 return true;
             }
+
             if ((saldo - costo) < SaldoMin) return false;
 
             saldo -= costo;
@@ -94,7 +120,9 @@ namespace Sube
 
             if (EsMedioBoleto || EsBoletoGratuito)
                 ViajesHoy++;
+
             UltimoViaje = ahora;
+            UltimaLineaViajada = lineaActual;
             return true;
         }
 
@@ -125,6 +153,5 @@ namespace Sube
             saldo += aAcreditar;
             SaldoPendiente -= aAcreditar;
         }
-
     }
 }
