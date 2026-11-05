@@ -21,7 +21,7 @@ public class Colectivo
 
         tarjeta.ActualizarDia(ahora);
 
-        int saldoAnterior = tarjeta.Saldo;
+        decimal saldoAnterior = tarjeta.Saldo;
         int precio = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica, ahora);
 
         if (!tarjeta.pagoRealizado(Tarjeta.TarifaBasica, ahora))
@@ -29,8 +29,8 @@ public class Colectivo
 
         int totalAbonado = precio;
         if (saldoAnterior < 0)
-            totalAbonado = precio - saldoAnterior;
+            totalAbonado = precio - (int)saldoAnterior;
 
-        return new Boleto(this, tarjeta, precio, totalAbonado, tarjeta.Saldo, ahora);
+        return new Boleto(this, tarjeta, precio, totalAbonado, (int)tarjeta.Saldo, ahora);
     }
 }

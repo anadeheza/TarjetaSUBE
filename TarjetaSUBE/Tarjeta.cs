@@ -10,8 +10,8 @@ namespace Sube
         private static int[] MontosValidos = { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
 
         public int Id { get; set; }
-        private int saldo;
-        public int Saldo => saldo;
+        private decimal saldo;
+        public decimal Saldo => saldo;
 
         public int Id_Tipo { get; set; }
         public TarjetaTipo Tipo { get; set; } = null!;
@@ -22,8 +22,13 @@ namespace Sube
         public bool EsMedioBoleto => Tipo?.Nombre == "Medio boleto estudiantil";
         public bool EsBoletoGratuito => Tipo?.Nombre == "Boleto gratuito estudiantil";
 
+        public DateTime? RetiroBici { get; private set; }
+        public decimal MultasBiciPendientes { get; private set; }
+        public bool TieneBiciFuera => RetiroBici is not null;
+
         public int ViajesHoy { get; private set; }
-        public int SaldoPendiente { get; private set; }
+
+        public decimal SaldoPendiente { get; private set; }
 
         public int ViajesDelMes { get; private set; }
         private int ultimoMesViaje = -1;
@@ -129,6 +134,33 @@ namespace Sube
             return true;
         }
 
+        public bool DescontarMontoFijo(decimal monto)
+        {
+            if (monto < 0)
+                return false;
+
+            if ((saldo - monto) < SaldoMin)
+                return false;
+
+            saldo -= monto;
+            AcreditarCarga();
+            return true;
+        }
+
+        public void RegistrarRetiroBici(DateTime ahora)
+        {
+            MultasBiciPendientes = 0;
+            RetiroBici = ahora;
+        }
+
+        public void RegistrarDevolucionBici(DateTime ahora, TimeSpan tiempoMaximo, decimal multa)
+        {
+            if (RetiroBici is not null && ahora - RetiroBici.Value > tiempoMaximo)
+                MultasBiciPendientes += multa;
+
+            RetiroBici = null;
+        }
+
         public bool PuedeViajar(DateTime ahora)
         {
             if (!EsNormal)
@@ -148,11 +180,11 @@ namespace Sube
 
         public void AcreditarCarga()
         {
-            int espacio = SaldoMax - saldo;
+            decimal espacio = SaldoMax - saldo;
             if (espacio <= 0 || SaldoPendiente <= 0)
                 return;
 
-            int aAcreditar = Math.Min(espacio, SaldoPendiente);
+            decimal aAcreditar = Math.Min(espacio, SaldoPendiente);
             saldo += aAcreditar;
             SaldoPendiente -= aAcreditar;
         }

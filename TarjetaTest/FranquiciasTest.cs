@@ -21,8 +21,9 @@ public class TarjetaFranquiciaTests
     {
         var tarjeta = new Tarjeta(1, tipoFranquiciaCompleta);
         var colectivo = new Colectivo("102");
+        var fechaViaje = new DateTime(2026, 11, 3, 10, 0, 0);
 
-        var boleto = colectivo.PagarCon(tarjeta);
+        var boleto = colectivo.PagarCon(tarjeta, fechaViaje);
 
         Assert.That(boleto, Is.Not.Null, "Una tarjeta con Franquicia Completa debería poder viajar siempre.");
         Assert.That(tarjeta.Saldo, Is.EqualTo(0), "El saldo no deberia reducirse cuando tiene boleto gratuito.");
