@@ -31,7 +31,7 @@ public class TarjetaTests
         var resultado = tarjeta.Cargar(monto);
 
         Assert.That(resultado, Is.True);
-        Assert.That(tarjeta.saldo, Is.EqualTo(monto));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(monto));
     }
 
     [Test]
@@ -42,77 +42,77 @@ public class TarjetaTests
         var resultado = tarjeta.Cargar(1500);
 
         Assert.That(resultado, Is.False);
-        Assert.That(tarjeta.saldo, Is.EqualTo(0));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(0));
     }
 
     [Test]
-    public void Cargar_RechazaSiSeSuperaElLimiteDeSaldo()
+    public void Cargar_AceptaUnaCargaQueAntesSuperabaElTopeViejo()
     {
         var tarjeta = new Tarjeta(1);
         tarjeta.Cargar(30000);
 
         var resultado = tarjeta.Cargar(15000);
 
-        Assert.That(resultado, Is.False);
-        Assert.That(tarjeta.saldo, Is.EqualTo(30000));
+        Assert.That(resultado, Is.True);
+        Assert.That(tarjeta.Saldo, Is.EqualTo(45000));
+        Assert.That(tarjeta.SaldoPendiente, Is.EqualTo(0));
     }
 
     [Test]
     public void Descontar_RestaElMontoSiHaySaldoSuficiente()
     {
         var tarjeta = new Tarjeta(1);
-        tarjeta.Cargar(2000);
+        tarjeta.Cargar(3000);
 
         var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
         Assert.That(resultado, Is.True);
-        Assert.That(tarjeta.saldo, Is.EqualTo(2000 - Tarjeta.TarifaBasica));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(3000 - Tarjeta.TarifaBasica));
     }
 
     [Test]
     public void Descontar_PermiteViajePlusSiNoHaySaldo()
     {
         var tarjeta = new Tarjeta(1);
+        tarjeta.Cargar(2000);
+
+        tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
         var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
-        Assert.That(resultado, Is.True);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(-Tarjeta.TarifaBasica));
+        Assert.That(resultado, Is.False);
+        Assert.That(tarjeta.Saldo, Is.EqualTo(-150));
     }
 
     [Test]
     public void Descontar_NoPermiteBajarDelSaldoMinimo()
     {
         var tarjeta = new Tarjeta(1);
-        tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
-        var resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+        bool resultado = tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
         Assert.That(resultado, Is.False);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(-Tarjeta.TarifaBasica));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(0));
     }
 
     [Test]
-    public void Cargar_DescuentaElViajePlus() 
+    public void Cargar_DescuentaElViajePlus()
     {
         var tarjeta = new Tarjeta(1);
+        tarjeta.Cargar(2000);
         tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
 
-        var resultado = tarjeta.Cargar(2000);
+        var resultado = tarjeta.Cargar(3000);
 
         Assert.That(resultado, Is.True);
-        Assert.That(tarjeta.Saldo, Is.EqualTo(2000 - Tarjeta.TarifaBasica));
+        Assert.That(tarjeta.Saldo, Is.EqualTo(2850));
     }
 
     [Test]
     public void BoletoUsoFrecuente_Viajes1a29_PagaTarifaCompleta()
     {
         var tarjeta = new Tarjeta(1, tipoNormal);
-
-        for (int i = 0; i < 28; i++)
-        {
-            tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
-        }
+        ViajarVeces(tarjeta, 28);
 
         int costoViaje29 = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
 
@@ -123,11 +123,7 @@ public class TarjetaTests
     public void BoletoUsoFrecuente_Viajes30a79_AplicaDescuento20PorCiento()
     {
         var tarjeta = new Tarjeta(1, tipoNormal);
-
-        for (int i = 0; i < 29; i++)
-        {
-            tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
-        }
+        ViajarVeces(tarjeta, 29);
 
         int costoEsperado = (int)Math.Round(Tarjeta.TarifaBasica * 0.80);
         int costoViaje30 = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
@@ -139,11 +135,7 @@ public class TarjetaTests
     public void BoletoUsoFrecuente_Viajes80EnAdelante_AplicaDescuento25PorCiento()
     {
         var tarjeta = new Tarjeta(1, tipoNormal);
-
-        for (int i = 0; i < 79; i++)
-        {
-            tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
-        }
+        ViajarVeces(tarjeta, 79);
 
         int costoEsperado = (int)Math.Round(Tarjeta.TarifaBasica * 0.75);
         int costoViaje80 = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
@@ -156,14 +148,20 @@ public class TarjetaTests
     {
         var tarjeta = new Tarjeta(2, tipoMedioBoleto);
 
-        for (int i = 0; i < 35; i++)
-        {
-            tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
-        }
-
         int costoEsperado = (int)Math.Round(Tarjeta.TarifaBasica * 0.5m);
         int costoCalculado = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica);
 
         Assert.That(costoCalculado, Is.EqualTo(costoEsperado));
+    }
+
+    private static void ViajarVeces(Tarjeta tarjeta, int veces)
+    {
+        for (int i = 0; i < veces; i++)
+        {
+            if (tarjeta.Saldo < Tarjeta.TarifaBasica)
+                tarjeta.Cargar(30000);
+
+            tarjeta.pagoRealizado(Tarjeta.TarifaBasica);
+        }
     }
 }
