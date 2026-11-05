@@ -21,16 +21,17 @@ public class Colectivo
 
         tarjeta.ActualizarDia(ahora);
 
+        bool esTrasbordo = tarjeta.EsTrasbordo(Linea, ahora);
         decimal saldoAnterior = tarjeta.Saldo;
-        int precio = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica, ahora);
+        int precio = tarjeta.CalcularBoleto(Tarjeta.TarifaBasica, Linea, ahora);
 
-        if (!tarjeta.pagoRealizado(Tarjeta.TarifaBasica, ahora))
+        if (!tarjeta.pagoRealizado(Tarjeta.TarifaBasica, Linea, ahora))
             return null;
 
         int totalAbonado = precio;
-        if (saldoAnterior < 0)
+        if (saldoAnterior < 0 && precio > 0)
             totalAbonado = precio - (int)saldoAnterior;
 
-        return new Boleto(this, tarjeta, precio, totalAbonado, (int)tarjeta.Saldo, ahora);
+        return new Boleto(colectivo: this, tarjeta: tarjeta, precio: precio, totalAbonado: totalAbonado, saldoRestante: (int)tarjeta.Saldo, fecha: ahora, esTrasbordo: esTrasbordo);
     }
 }

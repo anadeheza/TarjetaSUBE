@@ -9,6 +9,7 @@ public class Boleto
     public string Linea { get; set; } = string.Empty;
     public int TotalAbonado { get; set; }
     public int SaldoRestante { get; set; }
+    public bool EsTrasbordo { get; set; }
 
     public int TarjetaId { get; set; }
     public Tarjeta Tarjeta { get; set; } = null!;
@@ -18,7 +19,7 @@ public class Boleto
 
     public Boleto() { }
 
-    public Boleto(Colectivo colectivo, Tarjeta tarjeta, int precio, int? totalAbonado = null, int? saldoRestante = null, DateTime? fecha = null)
+    public Boleto(Colectivo colectivo, Tarjeta tarjeta, int precio, int? totalAbonado = null, int? saldoRestante = null, DateTime? fecha = null, bool esTrasbordo = false)
     {
         Colectivo = colectivo;
         Tarjeta = tarjeta;
@@ -30,6 +31,7 @@ public class Boleto
         TipoTarjeta = tarjeta.Tipo?.Nombre ?? "Normal";
         TotalAbonado = totalAbonado ?? precio;
         SaldoRestante = saldoRestante ?? (int)tarjeta.Saldo;
+        EsTrasbordo = esTrasbordo;
     }
 
     public DateTime GetFecha() => Fecha;
