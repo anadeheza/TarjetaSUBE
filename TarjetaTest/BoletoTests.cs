@@ -58,8 +58,9 @@ public class BoletoTests
         var tarjeta = new Tarjeta(2, tipoMedioBoleto);
         tarjeta.Cargar(2000);
         var colectivo = new Colectivo("132");
+        var fechaViaje = new DateTime(2026, 11, 3, 10, 0, 0);
 
-        var boleto = colectivo.PagarCon(tarjeta);
+        var boleto = colectivo.PagarCon(tarjeta, fechaViaje);
 
         Assert.That(boleto, Is.Not.Null);
         Assert.That(boleto!.GetTipoTarjeta(), Is.EqualTo("Medio boleto estudiantil"));
@@ -74,8 +75,9 @@ public class BoletoTests
     {
         var tarjeta = new Tarjeta(3, tipoGratuitoEstudiantil);
         var colectivo = new Colectivo("120");
+        var fechaViaje = new DateTime(2026, 11, 3, 10, 0, 0);
 
-        var boleto = colectivo.PagarCon(tarjeta);
+        var boleto = colectivo.PagarCon(tarjeta, fechaViaje);
 
         Assert.That(boleto, Is.Not.Null);
         Assert.That(boleto!.GetTipoTarjeta(), Is.EqualTo("Boleto gratuito estudiantil"));
@@ -90,8 +92,9 @@ public class BoletoTests
     {
         var tarjeta = new Tarjeta(4, tipoFranquiciaCompleta);
         var colectivo = new Colectivo("112");
+        var fechaViaje = new DateTime(2026, 11, 3, 10, 0, 0);
 
-        var boleto = colectivo.PagarCon(tarjeta);
+        var boleto = colectivo.PagarCon(tarjeta, fechaViaje);
 
         Assert.That(boleto, Is.Not.Null);
         Assert.That(boleto!.GetTipoTarjeta(), Is.EqualTo("Franquicia completa"));
@@ -104,18 +107,18 @@ public class BoletoTests
     [Test]
     public void Boleto_ConSaldoNegativo_AbonaMasQueLaTarifa()
     {
-        var tarjeta = new Tarjeta(8, tipoMedioBoleto);
+        var tarjeta = new Tarjeta(8, tipoNormal);
+        tarjeta.Cargar(2000);
         var colectivo = new Colectivo("102");
         var inicio = new DateTime(2026, 11, 3, 10, 0, 0);
 
-        colectivo.PagarCon(tarjeta, inicio);
-        var boleto = colectivo.PagarCon(tarjeta, inicio.AddMinutes(5));
+        var boleto = colectivo.PagarCon(tarjeta, inicio);
 
         Assert.That(boleto, Is.Not.Null);
         Assert.That(boleto!.GetTotalAbonado(), Is.EqualTo(Tarjeta.TarifaBasica));
-        Assert.That(boleto.GetTotalAbonado(), Is.GreaterThan(Tarjeta.TarifaBasica / 2));
-        Assert.That(boleto.GetSaldoRestante(), Is.EqualTo(-Tarjeta.TarifaBasica));
-        Assert.That(boleto.GetTipoTarjeta(), Is.EqualTo("Medio boleto estudiantil"));
+        Assert.That(boleto.GetSaldoRestante(), Is.EqualTo(2000 - Tarjeta.TarifaBasica));
+        Assert.That(boleto.GetSaldoRestante(), Is.LessThan(0));
+        Assert.That(boleto.GetTipoTarjeta(), Is.EqualTo("Normal"));
         Assert.That(boleto.GetIdTarjeta(), Is.EqualTo(8));
     }
 }

@@ -30,7 +30,7 @@ public class Boleto
         Linea = colectivo.Linea;
         TipoTarjeta = tarjeta.Tipo?.Nombre ?? "Normal";
         TotalAbonado = totalAbonado ?? precio;
-        SaldoRestante = saldoRestante ?? tarjeta.Saldo;
+        SaldoRestante = saldoRestante ?? (int)tarjeta.Saldo;
         EsTrasbordo = esTrasbordo;
     }
 

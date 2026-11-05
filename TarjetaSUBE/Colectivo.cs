@@ -27,7 +27,7 @@ namespace Sube
             tarjeta.ActualizarDia(ahora);
 
             bool esTrasbordo = tarjeta.EsTrasbordo(Linea, ahora);
-            int saldoAnterior = tarjeta.Saldo;
+            decimal saldoAnterior = tarjeta.Saldo;
             int precio = tarjeta.CalcularBoleto(Tarifa, Linea, ahora);
 
             if (!tarjeta.pagoRealizado(Tarifa, Linea, ahora))
@@ -35,9 +35,9 @@ namespace Sube
 
             int totalAbonado = precio;
             if (saldoAnterior < 0 && precio > 0)
-                totalAbonado = precio - saldoAnterior;
+                totalAbonado = precio - (int)saldoAnterior;
 
-            return new Boleto(colectivo: this, tarjeta: tarjeta, precio: precio, totalAbonado: totalAbonado, saldoRestante: tarjeta.Saldo, fecha: ahora, esTrasbordo: esTrasbordo);
+            return new Boleto(colectivo: this, tarjeta: tarjeta, precio: precio, totalAbonado: totalAbonado, saldoRestante: (int)tarjeta.Saldo, fecha: ahora, esTrasbordo: esTrasbordo);
         }
     }
 }

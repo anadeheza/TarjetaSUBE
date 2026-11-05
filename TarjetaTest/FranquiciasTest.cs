@@ -21,8 +21,9 @@ public class TarjetaFranquiciaTests
     {
         var tarjeta = new Tarjeta(1, tipoFranquiciaCompleta);
         var colectivo = new Colectivo("102");
+        var fechaViaje = new DateTime(2026, 11, 3, 10, 0, 0);
 
-        var boleto = colectivo.PagarCon(tarjeta);
+        var boleto = colectivo.PagarCon(tarjeta, fechaViaje);
 
         Assert.That(boleto, Is.Not.Null, "Una tarjeta con Franquicia Completa debería poder viajar siempre.");
         Assert.That(tarjeta.Saldo, Is.EqualTo(0), "El saldo no deberia reducirse cuando tiene boleto gratuito.");
@@ -37,8 +38,8 @@ public class TarjetaFranquiciaTests
         int costoNormal = tarjetaNormal.CalcularBoleto(Tarjeta.TarifaBasica);
         int costoMedio = tarjetaMedio.CalcularBoleto(Tarjeta.TarifaBasica);
 
-        Assert.That(costoNormal, Is.EqualTo(1580), "El pasaje normal deberia costar la tarifa base completa.");
-        Assert.That(costoMedio, Is.EqualTo(790), "El medio boleto deberia costar exactamente la mitad.");
+        Assert.That(costoNormal, Is.EqualTo(Tarjeta.TarifaBasica), "El pasaje normal deberia costar la tarifa base completa.");
+        Assert.That(costoMedio, Is.EqualTo(Tarjeta.TarifaBasica / 2), "El medio boleto deberia costar exactamente la mitad.");
         Assert.That(costoMedio, Is.EqualTo(costoNormal / 2), "El costo del medio boleto debe coincidir con costoNormal / 2.");
     }
 }
